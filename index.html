@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <title>美人製造研究所｜肌診断</title>
+  <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+  <style>
+    :root {
+      --pink:       #C8848E;
+      --pink-light: #FAF0F2;
+      --pink-mid:   #EDD4D8;
+      --text:       #3D2B30;
+      --text-mid:   #5A5A5A;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Hiragino Kaku Gothic ProN', 'ヒラギノ角ゴ ProN W3', 'Meiryo', sans-serif;
+      background: var(--pink-light);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+    }
+    .wrap {
+      width: 100%;
+      max-width: 480px;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      background: var(--pink-light);
+    }
+
+    /* ---- Header ---- */
+    .header {
+      background: var(--pink);
+      padding: 14px 16px;
+      text-align: center;
+      flex-shrink: 0;
+    }
+    .header p {
+      color: #fff;
+      font-size: 13px;
+      font-weight: bold;
+      letter-spacing: 0.1em;
+    }
+
+    /* ---- Loading ---- */
+    #screen-loading {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      color: var(--pink);
+      font-size: 14px;
+    }
+    .spinner {
+      width: 40px;
+      height: 40px;
+      border: 3px solid var(--pink-mid);
+      border-top-color: var(--pink);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ---- Screens ---- */
+    .screen { display: none; flex-direction: column; flex: 1; }
+    .screen.show { display: flex; }
+
+    /* ---- Start ---- */
+    .banner {
+      width: 100%;
+      aspect-ratio: 1040 / 400;
+      object-fit: cover;
+      display: block;
+    }
+    .start-body {
+      padding: 28px 24px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+    .start-title {
+      font-size: 22px;
+      font-weight: bold;
+      color: var(--text);
+      line-height: 1.5;
+      margin-bottom: 14px;
+    }
+    .start-desc {
+      font-size: 14px;
+      color: var(--text-mid);
+      line-height: 1.9;
+      margin-bottom: 36px;
+    }
+
+    /* ---- Progress ---- */
+    .progress-area {
+      padding: 14px 24px 0;
+      flex-shrink: 0;
+    }
+    .progress-label {
+      font-size: 12px;
+      color: var(--text-mid);
+      margin-bottom: 6px;
+    }
+    .progress-bar {
+      background: var(--pink-mid);
+      border-radius: 4px;
+      height: 6px;
+      overflow: hidden;
+    }
+    .progress-fill {
+      background: var(--pink);
+      height: 100%;
+      border-radius: 4px;
+      transition: width 0.35s ease;
+    }
+
+    /* ---- Question ---- */
+    .question-area {
+      flex: 1;
+      padding: 28px 24px 32px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+    .q-num {
+      font-size: 13px;
+      color: var(--pink);
+      font-weight: bold;
+      letter-spacing: 0.08em;
+      margin-bottom: 14px;
+    }
+    .q-text {
+      font-size: 20px;
+      font-weight: bold;
+      color: var(--text);
+      line-height: 1.7;
+      white-space: pre-wrap;
+      margin-bottom: 36px;
+    }
+    .btn-group { display: flex; flex-direction: column; gap: 14px; }
+
+    /* ---- Result ---- */
+    .result-img {
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      object-fit: cover;
+      display: block;
+      background: var(--pink-mid);
+    }
+    .result-body {
+      padding: 24px 24px 40px;
+    }
+    .result-label {
+      font-size: 12px;
+      color: var(--pink);
+      font-weight: bold;
+      letter-spacing: 0.1em;
+      margin-bottom: 8px;
+    }
+    .result-type {
+      font-size: 22px;
+      font-weight: bold;
+      color: var(--text);
+      margin-bottom: 16px;
+      line-height: 1.4;
+    }
+    .result-desc {
+      font-size: 14px;
+      color: var(--text-mid);
+      line-height: 1.9;
+      margin-bottom: 28px;
+    }
+    .result-retry {
+      font-size: 13px;
+      color: var(--pink);
+      text-align: center;
+      margin-top: 16px;
+      cursor: pointer;
+      text-decoration: underline;
+    }
+
+    /* ---- Buttons ---- */
+    .btn {
+      width: 100%;
+      padding: 18px;
+      border: none;
+      border-radius: 12px;
+      font-size: 17px;
+      font-weight: bold;
+      cursor: pointer;
+      letter-spacing: 0.08em;
+      transition: opacity 0.15s, transform 0.1s;
+    }
+    .btn:active { opacity: 0.85; transform: scale(0.98); }
+    .btn-primary { background: var(--pink); color: #fff; }
+    .btn-outline  { background: #fff; color: var(--pink); border: 2px solid var(--pink); }
+
+    /* ---- Error ---- */
+    .error-area {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      text-align: center;
+      gap: 16px;
+      color: var(--text-mid);
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <div class="header"><p>美人製造研究所｜肌診断</p></div>
+
+  <!-- Loading -->
+  <div id="screen-loading">
+    <div class="spinner"></div>
+    <p>読み込み中...</p>
+  </div>
+
+  <!-- Start -->
+  <div id="screen-start" class="screen">
+    <img class="banner"
+         src="https://drive.google.com/thumbnail?id=17wKlCI4F_6fbdcuO4SeCltXiurUDVH66&sz=w800"
+         alt="美人製造研究所 肌診断">
+    <div class="start-body">
+      <p class="start-title">あなたの肌タイプを<br>チェックしましょう</p>
+      <p class="start-desc">7つの質問に「はい」か「いいえ」で答えるだけで、あなたの肌タイプがわかります。<br>所要時間：約1分</p>
+      <button class="btn btn-primary" onclick="startQuiz()">診断スタート</button>
+    </div>
+  </div>
+
+  <!-- Question -->
+  <div id="screen-question" class="screen">
+    <div class="progress-area">
+      <p class="progress-label" id="progress-label">Q1 / 7</p>
+      <div class="progress-bar">
+        <div class="progress-fill" id="progress-fill" style="width:14%"></div>
+      </div>
+    </div>
+    <div class="question-area">
+      <p class="q-num" id="q-num">Q1</p>
+      <p class="q-text" id="q-text"></p>
+      <div class="btn-group">
+        <button class="btn btn-primary" onclick="answer('yes')">はい</button>
+        <button class="btn btn-outline"  onclick="answer('no')">いいえ</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Result -->
+  <div id="screen-result" class="screen">
+    <img class="result-img" id="result-img" src="" alt="診断結果">
+    <div class="result-body">
+      <p class="result-label">あなたの肌タイプ</p>
+      <p class="result-type" id="result-type"></p>
+      <p class="result-desc"  id="result-desc"></p>
+      <button class="btn btn-primary" onclick="goToShop()">おすすめアイテムを見る</button>
+      <p class="result-retry" onclick="startQuiz()">もう一度診断する</p>
+    </div>
+  </div>
+
+  <!-- Error -->
+  <div id="screen-error" class="screen">
+    <div class="error-area">
+      <p>読み込みに失敗しました。<br>ページを再読み込みしてください。</p>
+      <button class="btn btn-outline" onclick="location.reload()">再読み込み</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  /* ---- 設定（GASから注入） ---- */
+  const LIFF_ID = '2006491189-EP1LlEYY';
+  const GAS_URL = 'https://script.google.com/macros/s/AKfycbxHXY5GBX17Zrpp6kACmVL6j3DG956xjtRQavZST3fhmwXOES5KrBJO-wrJUFMxwqB7cw/exec';
+
+  /* ---- 診断ツリー定義 ---- */
+  const QUESTIONS = {
+    q1: { num: 1, text: '最近、肌がザラつく・\nゴワつく日が増えている？',                           yes: 'q2', no: 'q4' },
+    q2: { num: 2, text: '小鼻・あごに白いボツボツ\n（角栓）が目立つ？',                             yes: 'A',  no: 'q3' },
+    q3: { num: 3, text: '乾燥しているのに、\n触ると硬い・メイクが乗らない？',                       yes: 'B',  no: 'q4' },
+    q4: { num: 4, text: '最近、肌がどんよりして見える・\n透明感がない？',                           yes: 'q5', no: 'q7' },
+    q5: { num: 5, text: '花粉・黄砂の季節になると\n肌が敏感になりやすい？',                         yes: 'C',  no: 'q6' },
+    q6: { num: 6, text: '毛穴の黒ずみやしつこい\nザラつきが慢性的にある？',                         yes: 'D',  no: 'q7' },
+    q7: { num: 7, text: '朝の肌が冴えない・\n色ムラが気になる？',                                   yes: 'E',  no: 'F'  }
+  };
+
+  /* ---- 診断結果定義 ---- */
+  const RESULTS = {
+    A: {
+      name:    'Aタイプ｜皮脂 × 角質詰まりタイプ',
+      desc:    '皮脂の過剰分泌と角質の詰まりが重なりやすい肌タイプです。毛穴の角栓やザラつきが気になる方は、しっかりしたクレンジングと定期的な角質ケアを取り入れることが大切です。',
+      imageId: '1iRMrKYX7sRdFsaQNS06S84l7ANExcWi-'
+    },
+    B: {
+      name:    'Bタイプ｜乾燥ゴワつきタイプ',
+      desc:    '乾燥しているにもかかわらず肌表面が硬くゴワつきやすい肌タイプです。古い角質が蓄積しやすく、メイクの乗りにくさを感じることも。保湿と角質ケアを組み合わせたアプローチが効果的です。',
+      imageId: '1AJ-_fZLegc0D2yzC569SWfBks-6FFArn'
+    },
+    C: {
+      name:    'Cタイプ｜ゆらぎくすみタイプ',
+      desc:    '花粉・黄砂など外部刺激でゆらぎやすく、くすみとして現れやすい肌タイプです。バリア機能を高め、低刺激なケアで肌を安定させることが、透明感アップへの近道です。',
+      imageId: '1qwJwg-rB8BLa9JEi2VLwXso5P5EZlJ2x'
+    },
+    D: {
+      name:    'Dタイプ｜蓄積くすみタイプ',
+      desc:    '毛穴の黒ずみや慢性的なザラつきによって、くすみが蓄積しやすい肌タイプです。酸化した皮脂や古い角質が肌のトーンを下げる原因に。定期的なディープクレンジングで毛穴を清潔に保ちましょう。',
+      imageId: '1E45xdf2zBX8zjaMz-zLbSNrKO25xU_1-'
+    },
+    E: {
+      name:    'Eタイプ｜トーンダウンタイプ',
+      desc:    '朝の肌が冴えず、色ムラやくすみが気になりやすい肌タイプです。メラニンの蓄積や血行不良が透明感を低下させている可能性があります。ブライトニングケアと丁寧な洗浄で肌のトーンを整えましょう。',
+      imageId: '1ZTKLet-OjzxRH7SFfv5QaaQkRvUv6vdU'
+    },
+    F: {
+      name:    'Fタイプ｜軽度ゆらぎタイプ',
+      desc:    '大きな肌トラブルは少ないものの、ゆらぎのサインが出始めているタイプです。今の肌状態を維持しながら、揺らぎへの予防ケアを意識することで、より健やかな肌をキープできます。',
+      imageId: '1keaAshb8dKq9JWVrm3y4wInWs81LEmo8'
+    }
+  };
+
+  /* ---- 状態 ---- */
+  let lineUserId   = null;
+  let currentQKey  = 'q1';
+
+  /* ---- LIFF初期化 ---- */
+  (async () => {
+    try {
+      if (LIFF_ID) {
+        await liff.init({ liffId: LIFF_ID });
+        if (!liff.isLoggedIn()) {
+          liff.login({ redirectUri: location.href });
+          return;
+        }
+        try {
+          const profile = await liff.getProfile();
+          lineUserId = profile.userId;
+        } catch (e) {
+          console.warn('getProfile failed (may be external browser):', e);
+        }
+      }
+    } catch (err) {
+      console.error('LIFF init error:', err);
+    }
+    hide('screen-loading');
+    show('screen-start');
+  })();
+
+  /* ---- 画面切り替え ---- */
+  function show(id) {
+    hide('screen-loading');
+    ['screen-start', 'screen-question', 'screen-result', 'screen-error'].forEach(s => {
+      document.getElementById(s).classList.remove('show');
+    });
+    document.getElementById(id).classList.add('show');
+  }
+  function hide(id) {
+    document.getElementById(id).style.display = 'none';
+  }
+
+  /* ---- 診断開始 ---- */
+  function startQuiz() {
+    currentQKey = 'q1';
+    renderQuestion('q1');
+    show('screen-question');
+  }
+
+  /* ---- 質問を描画 ---- */
+  function renderQuestion(key) {
+    const q = QUESTIONS[key];
+    document.getElementById('q-num').textContent    = 'Q' + q.num;
+    document.getElementById('q-text').textContent   = q.text;
+    document.getElementById('progress-label').textContent = 'Q' + q.num + ' / 7';
+    document.getElementById('progress-fill').style.width  = (q.num / 7 * 100) + '%';
+    currentQKey = key;
+  }
+
+  /* ---- 回答処理 ---- */
+  function answer(yesNo) {
+    const next = QUESTIONS[currentQKey][yesNo];
+    if (next.length === 1) {
+      // A〜F = 結果確定
+      showResult(next);
+    } else {
+      // 次の質問
+      renderQuestion(next);
+    }
+  }
+
+  /* ---- 結果表示 ---- */
+  function showResult(type) {
+    const r = RESULTS[type];
+    document.getElementById('result-img').src   =
+      'https://drive.google.com/thumbnail?id=' + r.imageId + '&sz=w1040';
+    document.getElementById('result-type').textContent = r.name;
+    document.getElementById('result-desc').textContent = r.desc;
+    show('screen-result');
+
+    // GASに結果を送信（Shopifyタグ更新）
+    if (lineUserId && GAS_URL) {
+      fetch(GAS_URL, {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body:    JSON.stringify({ action: 'submit', userId: lineUserId, resultType: type, token: '2e62c5d3436285c8c73ea5fdeab77340' })
+      }).catch(err => console.error('submit error:', err));
+    }
+  }
+
+  /* ---- ショップへ遷移 ---- */
+  function goToShop() {
+    const url = 'https://bijin-seizo.com/collections/all';
+    if (typeof liff !== 'undefined' && liff.isInClient()) {
+      liff.openWindow({ url, external: false });
+    } else {
+      window.open(url, '_blank');
+    }
+  }
+</script>
+</body>
+</html>
