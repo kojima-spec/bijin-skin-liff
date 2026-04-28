@@ -257,7 +257,7 @@
 
   <!-- Result -->
   <div id="screen-result" class="screen">
-    <img class="result-img" id="result-img" src="" alt="診断結果">
+    <img class="result-img" id="result-img" src="" alt="診断結果" onclick="goToShop()" style="cursor:pointer;">
     <div class="result-body">
       <p class="result-label">あなたの肌タイプ</p>
       <p class="result-type" id="result-type"></p>
@@ -297,32 +297,38 @@
     A: {
       name:    'Aタイプ｜皮脂 × 角質詰まりタイプ',
       desc:    '皮脂の過剰分泌と角質の詰まりが重なりやすい肌タイプです。毛穴の角栓やザラつきが気になる方は、しっかりしたクレンジングと定期的な角質ケアを取り入れることが大切です。',
-      imageUrl: 'images/type-a.jpg'
+      imageUrl: 'images/type-a.jpg',
+      shopUrl:  'https://bijin-seizo.com/pages/skin-type_a'
     },
     B: {
       name:    'Bタイプ｜乾燥ゴワつきタイプ',
       desc:    '乾燥しているにもかかわらず肌表面が硬くゴワつきやすい肌タイプです。古い角質が蓄積しやすく、メイクの乗りにくさを感じることも。保湿と角質ケアを組み合わせたアプローチが効果的です。',
-      imageUrl: 'images/type-b.jpg'
+      imageUrl: 'images/type-b.jpg',
+      shopUrl:  'https://bijin-seizo.com/pages/skin-type_b'
     },
     C: {
       name:    'Cタイプ｜ゆらぎくすみタイプ',
       desc:    '花粉・黄砂など外部刺激でゆらぎやすく、くすみとして現れやすい肌タイプです。バリア機能を高め、低刺激なケアで肌を安定させることが、透明感アップへの近道です。',
-      imageUrl: 'images/type-c.jpg'
+      imageUrl: 'images/type-c.jpg',
+      shopUrl:  'https://bijin-seizo.com/pages/skin-type_c'
     },
     D: {
       name:    'Dタイプ｜蓄積くすみタイプ',
       desc:    '毛穴の黒ずみや慢性的なザラつきによって、くすみが蓄積しやすい肌タイプです。酸化した皮脂や古い角質が肌のトーンを下げる原因に。定期的なディープクレンジングで毛穴を清潔に保ちましょう。',
-      imageUrl: 'images/type-d.jpg'
+      imageUrl: 'images/type-d.jpg',
+      shopUrl:  'https://bijin-seizo.com/pages/skin-type_d'
     },
     E: {
       name:    'Eタイプ｜トーンダウンタイプ',
       desc:    '朝の肌が冴えず、色ムラやくすみが気になりやすい肌タイプです。メラニンの蓄積や血行不良が透明感を低下させている可能性があります。ブライトニングケアと丁寧な洗浄で肌のトーンを整えましょう。',
-      imageUrl: 'images/type-e.jpg'
+      imageUrl: 'images/type-e.jpg',
+      shopUrl:  'https://bijin-seizo.com/pages/skin-type_e'
     },
     F: {
       name:    'Fタイプ｜軽度ゆらぎタイプ',
       desc:    '大きな肌トラブルは少ないものの、ゆらぎのサインが出始めているタイプです。今の肌状態を維持しながら、揺らぎへの予防ケアを意識することで、より健やかな肌をキープできます。',
-      imageUrl: 'images/type-f.jpg'
+      imageUrl: 'images/type-f.jpg',
+      shopUrl:  'https://bijin-seizo.com/pages/skin-type_f'
     }
   };
 
@@ -395,10 +401,12 @@
   }
 
   /* ---- 結果表示 ---- */
+  let currentShopUrl = '';
+
   function showResult(type) {
     const r = RESULTS[type];
-    document.getElementById('result-img').src   =
-      r.imageUrl;
+    currentShopUrl = r.shopUrl;
+    document.getElementById('result-img').src   = r.imageUrl;
     document.getElementById('result-type').textContent = r.name;
     document.getElementById('result-desc').textContent = r.desc;
     show('screen-result');
@@ -415,7 +423,7 @@
 
   /* ---- ショップへ遷移 ---- */
   function goToShop() {
-    const url = 'https://bijin-seizo.com/collections/all';
+    const url = currentShopUrl || 'https://bijin-seizo.com/collections/all';
     if (typeof liff !== 'undefined' && liff.isInClient()) {
       liff.openWindow({ url, external: false });
     } else {
