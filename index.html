@@ -228,7 +228,7 @@
   <!-- Start -->
   <div id="screen-start" class="screen">
     <img class="banner"
-         src="https://drive.google.com/thumbnail?id=17wKlCI4F_6fbdcuO4SeCltXiurUDVH66&sz=w800"
+         src="images/banner.jpg"
          alt="美人製造研究所 肌診断">
     <div class="start-body">
       <p class="start-title">あなたの肌タイプを<br>チェックしましょう</p>
@@ -297,32 +297,32 @@
     A: {
       name:    'Aタイプ｜皮脂 × 角質詰まりタイプ',
       desc:    '皮脂の過剰分泌と角質の詰まりが重なりやすい肌タイプです。毛穴の角栓やザラつきが気になる方は、しっかりしたクレンジングと定期的な角質ケアを取り入れることが大切です。',
-      imageId: '1iRMrKYX7sRdFsaQNS06S84l7ANExcWi-'
+      imageUrl: 'images/type-a.jpg'
     },
     B: {
       name:    'Bタイプ｜乾燥ゴワつきタイプ',
       desc:    '乾燥しているにもかかわらず肌表面が硬くゴワつきやすい肌タイプです。古い角質が蓄積しやすく、メイクの乗りにくさを感じることも。保湿と角質ケアを組み合わせたアプローチが効果的です。',
-      imageId: '1AJ-_fZLegc0D2yzC569SWfBks-6FFArn'
+      imageUrl: 'images/type-b.jpg'
     },
     C: {
       name:    'Cタイプ｜ゆらぎくすみタイプ',
       desc:    '花粉・黄砂など外部刺激でゆらぎやすく、くすみとして現れやすい肌タイプです。バリア機能を高め、低刺激なケアで肌を安定させることが、透明感アップへの近道です。',
-      imageId: '1qwJwg-rB8BLa9JEi2VLwXso5P5EZlJ2x'
+      imageUrl: 'images/type-c.jpg'
     },
     D: {
       name:    'Dタイプ｜蓄積くすみタイプ',
       desc:    '毛穴の黒ずみや慢性的なザラつきによって、くすみが蓄積しやすい肌タイプです。酸化した皮脂や古い角質が肌のトーンを下げる原因に。定期的なディープクレンジングで毛穴を清潔に保ちましょう。',
-      imageId: '1E45xdf2zBX8zjaMz-zLbSNrKO25xU_1-'
+      imageUrl: 'images/type-d.jpg'
     },
     E: {
       name:    'Eタイプ｜トーンダウンタイプ',
       desc:    '朝の肌が冴えず、色ムラやくすみが気になりやすい肌タイプです。メラニンの蓄積や血行不良が透明感を低下させている可能性があります。ブライトニングケアと丁寧な洗浄で肌のトーンを整えましょう。',
-      imageId: '1ZTKLet-OjzxRH7SFfv5QaaQkRvUv6vdU'
+      imageUrl: 'images/type-e.jpg'
     },
     F: {
       name:    'Fタイプ｜軽度ゆらぎタイプ',
       desc:    '大きな肌トラブルは少ないものの、ゆらぎのサインが出始めているタイプです。今の肌状態を維持しながら、揺らぎへの予防ケアを意識することで、より健やかな肌をキープできます。',
-      imageId: '1keaAshb8dKq9JWVrm3y4wInWs81LEmo8'
+      imageUrl: 'images/type-f.jpg'
     }
   };
 
@@ -398,7 +398,7 @@
   function showResult(type) {
     const r = RESULTS[type];
     document.getElementById('result-img').src   =
-      'https://drive.google.com/thumbnail?id=' + r.imageId + '&sz=w1040';
+      r.imageUrl;
     document.getElementById('result-type').textContent = r.name;
     document.getElementById('result-desc').textContent = r.desc;
     show('screen-result');
